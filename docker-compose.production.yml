@@ -7,27 +7,32 @@ volumes:
 
 services:
   db:
-    image: postgres:13.10
+    image: postgres:13
     env_file: .env
     volumes:
       - pg_data:/var/lib/postgresql/data
+
   backend:
     image: svetazimina/kittygram_backend
     env_file: .env
     volumes:
       - static:/backend_static
       - media:/media
+    depends_on:
+      - db
+
   frontend:
     env_file: .env
     image: svetazimina/kittygram_frontend
-    command: cp -r /app/build/. /static/
+    command: cp -r /app/build/. /frontend_static/
     volumes:
-      - static:/static
+      - static:/frontend_static
+      
   gateway:
     image: svetazimina/kittygram_gateway
     env_file: .env
     ports:
       - 9000:80
     volumes:
-      - static:/staticfiles/
-      - media:/media/
+      - static:/staticfiles
+      - media:/media
